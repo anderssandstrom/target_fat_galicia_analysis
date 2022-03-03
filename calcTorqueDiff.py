@@ -109,19 +109,57 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
 
   # rescale acc so that avg corresponds to velo for the time
   acc , z = calcAcc(x, velo, 3, 1 / (sampleRate / filterSize))  
-  plt.subplot(3, 1, 1)
-  plt.plot(x, acc,'.-')
-  plt.grid()
-  plt.ylabel("acceleration [rpm/s]")
-  plt.subplot(3, 1, 2)
-  plt.plot(x,velo,'.-')
-  plt.plot(x,np.polyval(z,x),'.-')
-  plt.grid()
-  plt.ylabel("velocity [rpm]")
-  plt.subplot(3, 1, 3)
-  # remove offset
   npPos=np.array(pos)
   npPos=npPos-np.average(npPos)+180
+  
+  overflows=findOverflows(npPos)
+
+  plt.subplot(2, 1, 1)
+  start=overflows[0]
+  index=0
+  polys=[]
+  
+  slopediff=[]
+  
+  for overflow in overflows:
+    if index < len(overflows)-1:# and index<12:
+      end=overflows[index+1]-1
+    else:
+      continue
+    z, res, g, g, g = np.polyfit(npPos[start:end], acc[start:end], 3, full=True)
+    polys.append(z)
+    plt.plot(npPos[start:end], acc[start:end],'.-')
+    plt.plot(npPos[start:end],np.polyval(z,npPos[start:end]))
+    
+    # find min, max of slope over the rev and calc difference
+    zder=np.polyder(z)
+    maximum=np.polyval(zder,npPos[start])
+    minimum=maximum
+    for pos in npPos[start:end]:
+      val=np.polyval(zder,pos)
+      if val>maximum:
+          maximum=val
+      if val<minimum:
+          minimum=val
+    slopediff.append(maximum-minimum)
+
+    start=end+1
+    index=index+1
+
+  print("Slopdiff: " +str(slopediff))  
+  #skip last
+  #plt.plot(npPos[start:-1], acc[start:-1],'.-')    
+
+  plt.grid()
+  plt.ylabel("acceleration [rpm/s]")
+
+  #plt.subplot(3, 1, 2)
+  #plt.plot(x,velo,'.-')
+  #plt.plot(x,np.polyval(z,x),'.-')
+  #plt.grid()
+  #plt.ylabel("velocity [rpm]")
+  plt.subplot(2, 1, 2)
+  # remove offset
   plt.plot(x,npPos,'o-')
   #plt.legend(legStr)
   plt.grid()
@@ -129,6 +167,17 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   plt.ylabel("position [deg]")
   plt.xlabel("time [s]")
   plt.show()
+
+def findOverflows(positions):
+  overflows=[]
+  posMinus1=positions[0]
+  index=0
+  for pos in positions:
+    if(pos < ( posMinus1 - 200 )):
+      overflows.append(index+1)            
+    posMinus1 = pos
+    index=index+1
+  return overflows   
 
 def calcAcc(x,velo,order, sampleTimeS):
   
@@ -164,7 +213,7 @@ def calcAcc(x,velo,order, sampleTimeS):
   print("avgArrayValue: "+ str(avgArrayValue))
   print("avgAcc:        "+ str(avgAcc))
   print("totalTime:     " + str(totalTime))
-  return acc - avgArrayValue + avgAcc, z
+  return acc ,z #- avgArrayValue + avgAcc, z
   #return acc
 
 if __name__ == "__main__":  
