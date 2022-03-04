@@ -79,9 +79,6 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
       print("pos: " + str(posAct))
       velo.append(avgVelo)
       pos.append(posAct)
-      #accTemp = (avgVelo - velMinus1) * sampleRate
-      #acc.append(accTemp)
-      #print("acc: " + str(accTemp))
       x.append(time)
       index = 0
       print("tempvelo:" + str(tempvelo))
@@ -97,28 +94,86 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   acc , z = calcAcc(x, velo, 3, 1 / (sampleRate / filterSize))  
   npPos=np.array(pos)
   npPos=npPos-np.average(npPos)+180
-  
-  overflows=findOverflows(npPos)
+    
   fig1=plt.figure(1)
   fig2=plt.figure(2)
 
-  ax11=fig1.add_subplot(2, 1, 1)
+  plotVeloPos(fig1,x,npPos,velo,acc,z)
+  plotVeloDiff(fig2,x,npPos,velo,acc)
+
+  fig1.savefig('fig1.svg')
+  fig2.savefig('fig2.svg')
+  plt.show(block=True)
+
+def plotVeloPos(fig,time,npPos,velo,acc,z):
+  ax1=fig.add_subplot(3, 1, 1)
+  ax1.plot(time,acc,'.-')
+  ax1.grid()
+  ax1.set_ylabel("velocity (without linear comp) [rpm]")  
+  ax2=fig.add_subplot(3, 1, 2)
+  ax2.plot(time,velo,'.-')
+  #ax2.plot(time,np.polyval(z,time),'.-')
+  ax2.grid()
+  ax2.set_ylabel("velocity [rpm]")
+  ax3=fig.add_subplot(3, 1, 3)  
+  ax3.plot(time,npPos,'o-')  
+  ax3.grid()  
+  ax3.set_ylabel("position [deg]")
+  ax3.set_xlabel("time [s]")
+  ax1.set_title("Position and velocity during rampdown")
+
+def plotVeloDiff(fig,time,npPos,velo,acc):
+  overflows=findOverflows(npPos)
+  ax1=fig.add_subplot(1, 1, 1)
   start=overflows[0]
   index=0
   polys=[]
   
   slopediff=[]
+  legStr=[]
+  
+  colors=[]
+  colors.append('-b')
+  colors.append('-g')
+  colors.append('-r')
+  colors.append('-c')
+  colors.append('-m')
+  colors.append('-y')
+  colors.append('-k')
 
+  cIndex=index
+  # plot raw data
   for overflow in overflows:
     if index < len(overflows)-1 and index<12:
       end=overflows[index+1]-1
     else:
       continue
-    z, res, g, g, g = np.polyfit(npPos[start:end], acc[start:end], 3, full=True)
-    polys.append(z)
-    ax11.plot(npPos[start:end], acc[start:end],'.-')
-    ax11.plot(npPos[start:end], np.polyval(z,npPos[start:end]))
-    
+
+    if cIndex>=len(colors):
+      cIndex=0
+    ax1.plot(npPos[start:end], acc[start:end],"." + colors[cIndex])    
+    cIndex=cIndex+1
+    legStr.append("Rev " +str(index)+1)
+    start=end+1
+    index=index+1
+  
+  # plot fit valus
+  index = 0
+  cIndex=index
+  start=overflows[0]
+  # plot raw data
+  for overflow in overflows:
+    if index < len(overflows)-1 and index<12:
+      end=overflows[index+1]-1
+    else:
+      continue
+
+    if cIndex>=len(colors):
+        cIndex=0
+    z, res, g, g, g = np.polyfit(npPos[start:end], acc[start:end], 5, full=True)
+    polys.append(z)    
+    ax1.plot(npPos[start:end], np.polyval(z,npPos[start:end]),colors[cIndex])
+
     # find min, max of slope over the rev and calc difference
     zder=np.polyder(z)
     maximum=np.polyval(zder,npPos[start])
@@ -131,35 +186,19 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
           minimum=val
     slopediff.append(maximum-minimum)
 
+    cIndex=cIndex+1    
     start=end+1
     index=index+1
 
+  # only legend the "rawdata" use same colors for fit
+  ax1.legend(legStr)
   print("Slopdiff: " +str(slopediff))  
   #skip last
   #plt.plot(npPos[start:-1], acc[start:-1],'.-')    
 
-  ax11.grid()
-  ax11.set_ylabel("acceleration [rpm/s]")
-
-  #fig1.add_subplot(3, 1, 2)
-  #plt.plot(x,velo,'.-')
-  #plt.plot(x,np.polyval(z,x),'.-')
-  #plt.grid()
-  #plt.set_ylabel("velocity [rpm]")
-  ax12=fig1.add_subplot(2, 1, 2)
-  # remove offset
-  ax12.plot(x,npPos,'o-')
-  #plt.legend(legStr)
-  ax12.grid()
-  #plt.title(fname)
-  ax12.set_ylabel("position [deg]")
-  ax12.set_xlabel("time [s]")  
-  fig1.savefig('filename.svg')  
-  plt.show(block=True)
-
-
-def plotVeloPos(fig,npPos,velo):
-
+  ax1.grid()
+  ax1.set_ylabel("velociy [rpm]")
+  ax1.set_title("Velocity vs angle")
 
 def findOverflows(positions):
   overflows=[]
@@ -173,7 +212,6 @@ def findOverflows(positions):
   return overflows   
 
 def calcAcc(x,velo,order, sampleTimeS):
-  
   z, res, g, g, g = np.polyfit(x, velo, order, full=True)
   # subtract poly
   acc=(velo-np.polyval(z,x))
@@ -207,7 +245,6 @@ def calcAcc(x,velo,order, sampleTimeS):
   print("avgAcc:        "+ str(avgAcc))
   print("totalTime:     " + str(totalTime))
   return acc ,z #- avgArrayValue + avgAcc, z
-  #return acc
 
 if __name__ == "__main__":  
   if len(sys.argv)!=5:
@@ -224,5 +261,3 @@ if __name__ == "__main__":
     sys.exit()
   
   openAndCalc(npzfilename,xmin,xmax,gain)
-
-  
