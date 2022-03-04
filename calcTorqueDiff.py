@@ -46,10 +46,6 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   filterSize=int(sampleRate / 14.0)
 
   tempvelo=np.empty(int(filterSize))
-  #print("samplerate")
-  #print(sampleRate)
-  #print("filterSize")
-  #print(filterSize)
   
   overflow = 0
   firstscan=True
@@ -69,23 +65,15 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
     
     if(posAct < ( posMinus1 - 200 )):
       overflow = overflow + 1
-      #posMinus1 = posMinus1 - 360
-      
-      # ignore overflow data
       posMinus1 = posAct
-      continue
+      continue # ignore overflows
 
-    actVelo = (posAct - posMinus1) * sampleRate / 360 *60
-
-    #if abs(actVelo) > 1000:
-    #  posMinus1 = posAct
-    #  continue
+    actVelo = (posAct - posMinus1) * sampleRate / 360 * 60
 
     allvelo.append (actVelo)
     tempvelo[index] = actVelo
 
     if(index == filterSize - 1):
-      #velMinus1 = avgVelo
       avgVelo = np.average(tempvelo)
       print("velo: " + str(avgVelo))
       print("pos: " + str(posAct))
@@ -97,10 +85,8 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
       x.append(time)
       index = 0
       print("tempvelo:" + str(tempvelo))
-
       tempvelo = np.empty(int(filterSize))
-
-    else:      
+    else:
       index = index + 1
     
     posMinus1 = posAct
@@ -113,23 +99,25 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   npPos=npPos-np.average(npPos)+180
   
   overflows=findOverflows(npPos)
+  fig1=plt.figure(1)
+  fig2=plt.figure(2)
 
-  plt.subplot(2, 1, 1)
+  ax11=fig1.add_subplot(2, 1, 1)
   start=overflows[0]
   index=0
   polys=[]
   
   slopediff=[]
-  
+
   for overflow in overflows:
-    if index < len(overflows)-1:# and index<12:
+    if index < len(overflows)-1 and index<12:
       end=overflows[index+1]-1
     else:
       continue
     z, res, g, g, g = np.polyfit(npPos[start:end], acc[start:end], 3, full=True)
     polys.append(z)
-    plt.plot(npPos[start:end], acc[start:end],'.-')
-    plt.plot(npPos[start:end],np.polyval(z,npPos[start:end]))
+    ax11.plot(npPos[start:end], acc[start:end],'.-')
+    ax11.plot(npPos[start:end], np.polyval(z,npPos[start:end]))
     
     # find min, max of slope over the rev and calc difference
     zder=np.polyder(z)
@@ -150,23 +138,28 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   #skip last
   #plt.plot(npPos[start:-1], acc[start:-1],'.-')    
 
-  plt.grid()
-  plt.ylabel("acceleration [rpm/s]")
+  ax11.grid()
+  ax11.set_ylabel("acceleration [rpm/s]")
 
-  #plt.subplot(3, 1, 2)
+  #fig1.add_subplot(3, 1, 2)
   #plt.plot(x,velo,'.-')
   #plt.plot(x,np.polyval(z,x),'.-')
   #plt.grid()
-  #plt.ylabel("velocity [rpm]")
-  plt.subplot(2, 1, 2)
+  #plt.set_ylabel("velocity [rpm]")
+  ax12=fig1.add_subplot(2, 1, 2)
   # remove offset
-  plt.plot(x,npPos,'o-')
+  ax12.plot(x,npPos,'o-')
   #plt.legend(legStr)
-  plt.grid()
+  ax12.grid()
   #plt.title(fname)
-  plt.ylabel("position [deg]")
-  plt.xlabel("time [s]")
-  plt.show()
+  ax12.set_ylabel("position [deg]")
+  ax12.set_xlabel("time [s]")  
+  fig1.savefig('filename.svg')  
+  plt.show(block=True)
+
+
+def plotVeloPos(fig,npPos,velo):
+
 
 def findOverflows(positions):
   overflows=[]
