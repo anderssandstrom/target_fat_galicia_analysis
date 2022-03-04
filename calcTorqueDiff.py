@@ -16,10 +16,13 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
+revs = 0
+I=5260
+
 def printOutHelp():
   print("calcTorqueDiff: calcs velo from position. ")
-  print("python calcTorqueDiff.py  <filename.npz> <from_sample> <to_sample> <gain>")
-  print("example: python calcTorqueDiff.py data.npz 100 1500 -1")
+  print("python calcTorqueDiff.py  <filename.npz> <from_sample> <to_sample> <gain> <rev_count>" )
+  print("example: python calcTorqueDiff.py data.npz 100 1500 -1 10")
   return
 
 def openAndCalc(npzfilename,xmin,xmax,sign):    
@@ -104,19 +107,27 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   fig1.savefig('fig1.svg')
   fig2.savefig('fig2.svg')
   plt.show(block=True)
+  #figManager = plt.get_current_fig_manager()
+  #figManager.window.showMaximized()
 
 def plotVeloPos(fig,time,npPos,velo,acc,z):
+  overflows=findOverflows(npPos)
+
   ax1=fig.add_subplot(3, 1, 1)
   ax1.plot(time,acc,'.-')
   ax1.grid()
+  plotRevLines(ax1,overflows,time,np.min(acc),np.max(acc))
+
   ax1.set_ylabel("velocity (without linear comp) [rpm]")  
   ax2=fig.add_subplot(3, 1, 2)
   ax2.plot(time,velo,'.-')
+  plotRevLines(ax2,overflows,time,np.min(velo),np.max(velo))
   #ax2.plot(time,np.polyval(z,time),'.-')
   ax2.grid()
   ax2.set_ylabel("velocity [rpm]")
   ax3=fig.add_subplot(3, 1, 3)  
-  ax3.plot(time,npPos,'o-')  
+  ax3.plot(time,npPos,'.-')
+  plotRevLines(ax3,overflows,time,np.min(npPos),np.max(npPos))
   ax3.grid()  
   ax3.set_ylabel("position [deg]")
   ax3.set_xlabel("time [s]")
@@ -124,12 +135,14 @@ def plotVeloPos(fig,time,npPos,velo,acc,z):
 
 def plotVeloDiff(fig,time,npPos,velo,acc):
   overflows=findOverflows(npPos)
-  ax1=fig.add_subplot(1, 1, 1)
+  ax1=fig.add_subplot(2, 1, 1)
+  ax2=fig.add_subplot(2, 1, 2)
   start=overflows[0]
   index=0
   polys=[]
   
-  slopediff=[]
+  slopediffDeg=[]
+  slopediffTime=[]
   legStr=[]
   
   colors=[]
@@ -144,7 +157,7 @@ def plotVeloDiff(fig,time,npPos,velo,acc):
   cIndex=index
   # plot raw data
   for overflow in overflows:
-    if index < len(overflows)-1 and index<12:
+    if index < len(overflows)-1 and index<revs:
       end=overflows[index+1]-1
     else:
       continue
@@ -152,18 +165,23 @@ def plotVeloDiff(fig,time,npPos,velo,acc):
     if cIndex>=len(colors):
       cIndex=0
     ax1.plot(npPos[start:end], acc[start:end],"." + colors[cIndex])    
+    
+    legStr.append("Rev " +str(index+1))
+  
+    ax2.plot(time[start:end]-time[start], acc[start:end],"." + colors[cIndex])    
+    
     cIndex=cIndex+1
-    legStr.append("Rev " +str(index)+1)
     start=end+1
     index=index+1
   
-  # plot fit valus
+    
+  # plot fit values
   index = 0
   cIndex=index
   start=overflows[0]
   # plot raw data
   for overflow in overflows:
-    if index < len(overflows)-1 and index<12:
+    if index < len(overflows)-1 and index<revs:
       end=overflows[index+1]-1
     else:
       continue
@@ -184,21 +202,61 @@ def plotVeloDiff(fig,time,npPos,velo,acc):
           maximum=val
       if val<minimum:
           minimum=val
-    slopediff.append(maximum-minimum)
+    slopediffDeg.append(maximum-minimum)
+
+    z, res, g, g, g = np.polyfit(time[start:end]-time[start], acc[start:end], 5, full=True)    
+    ax2.plot(time[start:end]-time[start], np.polyval(z,time[start:end]-time[start]),colors[cIndex])
+
+    # find min, max of slope over the rev and calc difference
+    zder=np.polyder(z)
+    maximum=np.polyval(zder,0)
+    minimum=maximum
+    for t in time[start:end]-time[start]:
+      val=np.polyval(zder,t)
+      if val>maximum:
+          maximum=val
+      if val<minimum:
+          minimum=val
+    slopediffTime.append(maximum-minimum)
 
     cIndex=cIndex+1    
     start=end+1
     index=index+1
 
   # only legend the "rawdata" use same colors for fit
-  ax1.legend(legStr)
-  print("Slopdiff: " +str(slopediff))  
+  ax1.legend(legStr,loc='upper right')
+  npSlopeDiffDeg=np.array(slopediffDeg)
+  print("slopediffDeg: " +str(slopediffDeg) +  "Avg: " + str(np.average(npSlopeDiffDeg)))
+
+  npSlopeDiffTime=np.array(slopediffTime)
+  print("slopediffTime: " +str(npSlopeDiffTime) +  "Avg: " + str(np.average(npSlopeDiffTime)))
+  
+  alfa=npSlopeDiffTime * 2*3.1415/60
+
+  torque=I*alfa/2
+
+  print("torque (+-): " + str(torque) + "Nm (Avg " +str(np.average(torque))+ "Nm)")
+
+
   #skip last
   #plt.plot(npPos[start:-1], acc[start:-1],'.-')    
 
   ax1.grid()
+  ax1.set_xlabel("Wheel angle [deg]")
   ax1.set_ylabel("velociy [rpm]")
-  ax1.set_title("Velocity vs angle")
+  ax1.set_title("Velocity vs angle for " + str(int(revs)) + " revs")
+  ax2.grid()
+  ax2.legend(legStr,loc='upper right')
+  ax2.set_xlabel("Time [s]")
+  ax2.set_ylabel("velociy [rpm]")
+  ax2.set_title("Velocity vs time for " + str(int(revs)) + " revs")
+
+def plotRevLines(ax,overflows,time,ymin,ymax):
+   for of in overflows:
+       x=time[of]
+       print("X: " + str(x))
+       ax.plot([x ,x], [ymin, ymax], "-r")
+
 
 def findOverflows(positions):
   overflows=[]
@@ -247,7 +305,7 @@ def calcAcc(x,velo,order, sampleTimeS):
   return acc ,z #- avgArrayValue + avgAcc, z
 
 if __name__ == "__main__":  
-  if len(sys.argv)!=5:
+  if len(sys.argv)!=6:
     printOutHelp()
     sys.exit()
   
@@ -255,6 +313,7 @@ if __name__ == "__main__":
   xmin = int(sys.argv[2])
   xmax = int(sys.argv[3])
   gain = float(sys.argv[4])
+  revs = float(sys.argv[5])
   
   if npzfilename is None:
     print("Input file: " + npzfilename + " not valid.")
