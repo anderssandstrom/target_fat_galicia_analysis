@@ -1,0 +1,1 @@
+cat ~/target_analysis/thursday/rampup_23_rpm_1.log | tail -n 7000 | head -n 6000 | awk '{print $1 " " $2 " " $3 " " $4;}' | bash calcVeloCa.bash | grep "Velo\|Opto" | bash filterHighLow.bash Opto 20 37.7 |bash filterHighLow.bash Velo -1 30 |python ~/sources/ecmccomgui/pyDataManip/plotCaMonitorYY.py Opto Velo
