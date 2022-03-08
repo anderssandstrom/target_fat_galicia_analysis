@@ -1,0 +1,25 @@
+dev@mcag-epics4 calib_120 (master) $ cat calib23.sh.log 
+Statistics: 
+Opto[1996] 34.147156..37.558036, mean: 35.8457130441, std: 0.988326856561
+Velo[1928] 22.9345..23.0564, mean: 22.9968690353, std: 0.0228509229387
+len: 1996 1928
+dev@mcag-epics4 calib_120 (master) $ cat calib23_eddy.sh.log 
+Statistics: 
+AI2[1668] 10.5027712..15.12497776, mean: 12.7128312766, std: 1.50961544245
+Velo[1601] 23.9296..24.0515, mean: 23.9968604622, std: 0.0169395207262
+len: 1668 1601
+dev@mcag-epics4 calib_120 (master) $ python 
+Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> optodiff=37.558036-34.147156
+>>> eddydiff=15.12497776-10.5027712
+>>> optodiff
+3.410879999999999
+>>> eddydiff
+4.62220656
+>>> scalefactor=optodiff/eddydiff
+>>> scalefactor
+0.7379332696892712
+>>> quit()
+
