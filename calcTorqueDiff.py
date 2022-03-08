@@ -97,18 +97,18 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   velWithoutLinDec , z = calcAcc(x, velo, 3, 1 / (sampleRate / filterSize))  
   npPos=np.array(pos)
   npPos=npPos-np.average(npPos)+180
-
-  fig1      = plt.figure(1)
-  figVelo   = plt.figure(2)
-  figTorque = plt.figure(3)
+    
+  fig1=plt.figure(1)
+  fig2=plt.figure(2)
+  fig3=plt.figure(3)
 
   plotVeloPos(fig1,x,npPos,velo,velWithoutLinDec,z)
-  angleRev, timeRev, accPolysVsAngle, accPolysVsTime = plotVeloDiff(figVelo,figTorque,x,npPos,velo,velWithoutLinDec)
-  #plotTorqueDiff(fig3,angleRev, timeRev, accPolysVsAngle, accPolysVsTime)
+  angleRev, timeRev, accPolysVsAngle, accPolysVsTime= plotVeloDiff(fig2,x,npPos,velo,velWithoutLinDec)
+  plotTorqueDiff(fig3,angleRev, timeRev, accPolysVsAngle, accPolysVsTime):
 
   fig1.savefig('fig1.svg')
-  figVelo.savefig('fig2.svg')
-  figTorque.savefig('fig3.svg')
+  fig2.savefig('fig2.svg')
+  fig3.savefig('fig3.svg')
   plt.show(block=True)
 
 def plotVeloPos(fig,time,npPos,velo,velWithoutLinDec,z):
@@ -134,27 +134,22 @@ def plotVeloPos(fig,time,npPos,velo,velWithoutLinDec,z):
   ax3.set_xlabel("time [s]")
   ax1.set_title("Position and velocity during rampdown")
 
-def plotVeloDiff(figVelo,figTorque,time,npPos,velo,velWithoutLinDec):
+def plotVeloDiff(fig,time,npPos,velo,velWithoutLinDec):
   overflows=findOverflows(npPos)
-  ax1 = figVelo.add_subplot(2, 1, 1)
-  ax2 = figVelo.add_subplot(2, 1, 2)
-
-  ax1Torque = figTorque.add_subplot(2, 1, 1)
-  ax2Torque = figTorque.add_subplot(2, 1, 2)
-
-  start = overflows[0]
-  index = 0
-  velRevPolysAngle = []
-  accPolysVsTime   = []
-  accPolysVsAngle  = []
-  timeRev          = []
-  angleRev         = []
-  slopediffDeg     = []
-  slopediffTime    = []
-  legStr           = []
+  ax1=fig.add_subplot(2, 1, 1)
+  ax2=fig.add_subplot(2, 1, 2)
+  start=overflows[0]
+  index=0
+  velRevPolysAngle=[]
+  accPolysVsTime=[]
+  accPolysVsAngle = []
+  timeRev  = []
+  angleRev =[]
+  slopediffDeg=[]
+  slopediffTime=[]
+  legStr=[]
   
-  colors           = []
-
+  colors=[]
   colors.append('-b')
   colors.append('-g')
   colors.append('-r')
@@ -202,57 +197,51 @@ def plotVeloDiff(figVelo,figTorque,time,npPos,velo,velWithoutLinDec):
     ax1.plot(npPos[start:end], np.polyval(z,npPos[start:end]),colors[cIndex])
 
     # find min, max of slope vs angle over the rev and calc difference
-    zder = np.polyder(z)
-
-    ax1Torque.plot(npPos[start:end], np.polyval(zder,npPos[start:end]),colors[cIndex])
-
+    zder=np.polyder(z)
     accPolysVsAngle.append(zder)
-    maximum = np.polyval(zder,npPos[start])
-    minimum = maximum
+    maximum=np.polyval(zder,npPos[start])
+    minimum=maximum
     for pos in npPos[start:end]:
       val=np.polyval(zder,pos)
-      if val > maximum:
-          maximum = val
-      if val < minimum:
-          minimum = val
+      if val>maximum:
+          maximum=val
+      if val<minimum:
+          minimum=val
     slopediffDeg.append(maximum-minimum)
 
     z, res, g, g, g = np.polyfit(time[start:end]-time[start], velWithoutLinDec[start:end], 5, full=True)    
     ax2.plot(time[start:end]-time[start], np.polyval(z,time[start:end]-time[start]),colors[cIndex])
 
-    # find min, max of slope vs time over the rev and calc difference    
-    zder = np.polyder(z)
-    
-    ax2Torque.plot(time[start:end]-time[start], np.polyval(zder,time[start:end]-time[start])*2*3.1415/60*I,colors[cIndex])
-
+    # find min, max of slope vs time over the rev and calc difference
+    zder=np.polyder(z)
     accPolysVsTime.append(zder)
-    maximum = np.polyval(zder,0)
-    minimum = maximum
+    maximum=np.polyval(zder,0)
+    minimum=maximum
     for t in time[start:end]-time[start]:
       val=np.polyval(zder,t)
-      if val > maximum:
-          maximum = val
-      if val < minimum:
-          minimum = val
+      if val>maximum:
+          maximum=val
+      if val<minimum:
+          minimum=val
     slopediffTime.append(maximum-minimum)
-
+    
     timeRev.append(time[start:end])
     angleRev.append(npPos[start:end])
-    cIndex = cIndex +1    
-    start  = end + 1
-    index  = index + 1
+    cIndex=cIndex+1    
+    start=end+1
+    index=index+1
 
   # only legend the "rawdata" use same colors for fit
   ax1.legend(legStr,loc='upper right')
-  npSlopeDiffDeg = np.array(slopediffDeg)
+  npSlopeDiffDeg=np.array(slopediffDeg)
   print("slopediffDeg: " +str(slopediffDeg) +  "Avg: " + str(np.average(npSlopeDiffDeg)))
 
   npSlopeDiffTime=np.array(slopediffTime)
   print("slopediffTime: " +str(npSlopeDiffTime) +  "Avg: " + str(np.average(npSlopeDiffTime)))
   
-  alfa = npSlopeDiffTime * 2*3.1415/60
+  alfa=npSlopeDiffTime * 2*3.1415/60
 
-  torque = I*alfa/2
+  torque=I*alfa/2
 
   print("torque (+-): " + str(torque) + "Nm (Avg " +str(np.average(torque))+ "Nm)")
 
@@ -277,7 +266,6 @@ def plotTorqueDiff(fig,angleRev, timeRev, accPolysVsAngle, accPolysVsTime):
   ax2=fig.add_subplot(2, 1, 2)
   index = 0
   cIndex=index
-  legStr=[]
   colors=[]
   colors.append('-b')
   colors.append('-g')
@@ -286,13 +274,13 @@ def plotTorqueDiff(fig,angleRev, timeRev, accPolysVsAngle, accPolysVsTime):
   colors.append('-m')
   colors.append('-y')
   colors.append('-k')
+  print("jshdak.lsjföasbföalskalsknfd")
   for z in accPolysVsTime:
     if cIndex>=len(colors):
        cIndex=0
-    print(z)
-    ax2.plot(timeRev, np.polyval(np.array(z),np.array(timeRev)),colors[cIndex])
 
-    legStr.append("Rev " + str(index+1))
+    ax2.plot(timeRev, np.polyval(z,timeRev,colors[cIndex])
+    legStr.append("Rev " +str(index+1))
 
     cIndex=cIndex+1  
     index=index+1
