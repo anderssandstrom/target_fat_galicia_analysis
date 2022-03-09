@@ -1,8 +1,5 @@
-Added PV: IOC_TEST:ec0-s2-EL3174_0to10V-AI2Max
-Added PV: IOC_TEST:ec0-s2-EL3174_0to10V-AI2Min
 Ignoring line: 
  (Missing timestamp ":").
-Statistics: 
-[<caPVArrayLib.caPVArray instance at 0x7f47ea747830>, <caPVArrayLib.caPVArray instance at 0x7f47ea747e60>]
-IOC_TEST:ec0-s2-EL3174_0to10V-AI2Max[3572] 8.45261..11.5928, mean: 11.1270842861, std: 0.0847828882654
-IOC_TEST:ec0-s2-EL3174_0to10V-AI2Min[3572] 7.38257..9.95596, mean: 7.74397261478, std: 0.0686528740456
+statistics
+Max[3572] -0.982919000174..2.15731477114, mean: 1.69155470364, std: 0.0847826453739
+Min[3572] -2.05295386166..0.520435258327, mean: -1.69155470364, std: 0.0686529659297
