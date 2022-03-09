@@ -3,6 +3,6 @@ Added PV: IOC_TEST:ec0-s5-OptoILD2300_50mm-CH1-PosActMin
 Ignoring line: 
  (Missing timestamp ":").
 Statistics: 
-[<caPVArrayLib.caPVArray instance at 0x7fe90f5b1830>, <caPVArrayLib.caPVArray instance at 0x7fe90f5b1e60>]
+[<caPVArrayLib.caPVArray instance at 0x7fd7ffa29830>, <caPVArrayLib.caPVArray instance at 0x7fd7ffa29e60>]
 IOC_TEST:ec0-s5-OptoILD2300_50mm-CH1-PosActMax[3573] 30.014524..35.10004, mean: 34.1538060688, std: 0.347687928799
 IOC_TEST:ec0-s5-OptoILD2300_50mm-CH1-PosActMin[3573] 28.189948..31.499848, mean: 28.518977105, std: 0.0835162964384
