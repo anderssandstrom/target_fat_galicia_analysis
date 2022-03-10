@@ -26,7 +26,8 @@ def main():
 
   pvNames=[]
   
-  pvNames.append("Torque")
+  pvNames.append("TorqueMin")
+  pvNames.append("TorqueMax")
   pvNames.append("Motor-Temp")
   pvNames.append("High-Bearing-Temp")
   pvNames.append("Low-Bearing-Temp")
@@ -72,13 +73,18 @@ def main():
     index=index+1
 
   legstr=[]
-  legstr.append("Torque")
+  legstr.append("Torque Min")
+  legstr.append("Torque Avg")
+  legstr.append("Torque Max")
   fig2=plt.figure(2)
   ax1=fig2.add_subplot(2, 1, 1)
   ax1.plot(yTime[0],yData[0], 'b')
+  ax1.plot(yTime[1],(yData[1]+yData[0])/2, 'g')
+  ax1.plot(yTime[1],yData[1], 'm')
+
   ax1.set_ylabel("Torque [Nm]")
   ax1.legend(legstr)
-  ax1.set_ylim(100,180)
+  ax1.set_ylim(80,200)
   ax1.grid()
   
   legstr=[]
@@ -86,9 +92,9 @@ def main():
   legstr.append("Bearing temp (upper)")
   legstr.append("Bearing temp (lower)")
   ax2=fig2.add_subplot(2, 1, 2)
-  ax2.plot(yTime[1],yData[1], 'b')
-  ax2.plot(yTime[2],yData[2], 'g')
-  ax2.plot(yTime[3],yData[3], 'm')
+  ax2.plot(yTime[2],yData[2], 'b')
+  ax2.plot(yTime[3],yData[3], 'g')
+  ax2.plot(yTime[4],yData[4], 'm')
   ax2.set_ylabel("Temperature [degC]")
   ax2.legend(legstr, loc="lower right")
   #ax2.set_ylim(23.5,24.5)
