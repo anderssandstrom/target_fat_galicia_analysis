@@ -2217,29 +2217,8 @@ M72 200.291
 L72 43.2" style="fill:none;stroke:#000000;"/>
    </g>
    <g id="text_20">
-    <!-- Velocity vs angle for 13 revs -->
+    <!-- Velocity vs angle -->
     <defs>
-     <path d="
-M37.1094 75.9844
-L37.1094 68.5
-L28.5156 68.5
-Q23.6875 68.5 21.7969 66.5469
-Q19.9219 64.5938 19.9219 59.5156
-L19.9219 54.6875
-L34.7188 54.6875
-L34.7188 47.7031
-L19.9219 47.7031
-L19.9219 0
-L10.8906 0
-L10.8906 47.7031
-L2.29688 47.7031
-L2.29688 54.6875
-L10.8906 54.6875
-L10.8906 58.5
-Q10.8906 67.625 15.1406 71.7969
-Q19.3906 75.9844 28.6094 75.9844
-z
-" id="DejaVuSans-66"/>
      <path d="
 M18.3125 70.2188
 L18.3125 54.6875
@@ -2302,7 +2281,7 @@ Q16.75 56 26.8125 56
 Q31.7812 56 36.1719 55.2656
 Q40.5781 54.5469 44.2812 53.0781" id="DejaVuSans-73"/>
     </defs>
-    <g transform="translate(193.572 38.2)scale(0.144 -0.144)">
+    <g transform="translate(234.77175 38.2)scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-56"/>
      <use x="60.658203125" xlink:href="#DejaVuSans-65"/>
      <use x="122.181640625" xlink:href="#DejaVuSans-6c"/>
@@ -2320,18 +2299,6 @@ Q40.5781 54.5469 44.2812 53.0781" id="DejaVuSans-73"/>
      <use x="691.810546875" xlink:href="#DejaVuSans-67"/>
      <use x="755.287109375" xlink:href="#DejaVuSans-6c"/>
      <use x="783.0703125" xlink:href="#DejaVuSans-65"/>
-     <use x="844.59375" xlink:href="#DejaVuSans-20"/>
-     <use x="876.380859375" xlink:href="#DejaVuSans-66"/>
-     <use x="911.5859375" xlink:href="#DejaVuSans-6f"/>
-     <use x="972.767578125" xlink:href="#DejaVuSans-72"/>
-     <use x="1013.88085938" xlink:href="#DejaVuSans-20"/>
-     <use x="1045.66796875" xlink:href="#DejaVuSans-31"/>
-     <use x="1109.29101562" xlink:href="#DejaVuSans-33"/>
-     <use x="1172.9140625" xlink:href="#DejaVuSans-20"/>
-     <use x="1204.70117188" xlink:href="#DejaVuSans-72"/>
-     <use x="1243.56445312" xlink:href="#DejaVuSans-65"/>
-     <use x="1305.08789062" xlink:href="#DejaVuSans-76"/>
-     <use x="1364.26757812" xlink:href="#DejaVuSans-73"/>
     </g>
    </g>
    <g id="legend_1">
@@ -4206,8 +4173,8 @@ M72 388.8
 L72 231.709" style="fill:none;stroke:#000000;"/>
    </g>
    <g id="text_47">
-    <!-- Velocity vs time for 13 revs -->
-    <g transform="translate(197.28225 226.709090909)scale(0.144 -0.144)">
+    <!-- Velocity vs time -->
+    <g transform="translate(238.482 226.709090909)scale(0.144 -0.144)">
      <use xlink:href="#DejaVuSans-56"/>
      <use x="60.658203125" xlink:href="#DejaVuSans-65"/>
      <use x="122.181640625" xlink:href="#DejaVuSans-6c"/>
@@ -4224,18 +4191,6 @@ L72 231.709" style="fill:none;stroke:#000000;"/>
      <use x="606.361328125" xlink:href="#DejaVuSans-69"/>
      <use x="634.14453125" xlink:href="#DejaVuSans-6d"/>
      <use x="731.556640625" xlink:href="#DejaVuSans-65"/>
-     <use x="793.080078125" xlink:href="#DejaVuSans-20"/>
-     <use x="824.8671875" xlink:href="#DejaVuSans-66"/>
-     <use x="860.072265625" xlink:href="#DejaVuSans-6f"/>
-     <use x="921.25390625" xlink:href="#DejaVuSans-72"/>
-     <use x="962.3671875" xlink:href="#DejaVuSans-20"/>
-     <use x="994.154296875" xlink:href="#DejaVuSans-31"/>
-     <use x="1057.77734375" xlink:href="#DejaVuSans-33"/>
-     <use x="1121.40039062" xlink:href="#DejaVuSans-20"/>
-     <use x="1153.1875" xlink:href="#DejaVuSans-72"/>
-     <use x="1192.05078125" xlink:href="#DejaVuSans-65"/>
-     <use x="1253.57421875" xlink:href="#DejaVuSans-76"/>
-     <use x="1312.75390625" xlink:href="#DejaVuSans-73"/>
     </g>
    </g>
    <g id="legend_2">

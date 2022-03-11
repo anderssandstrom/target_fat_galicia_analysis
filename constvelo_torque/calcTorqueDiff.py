@@ -307,8 +307,7 @@ def plotTorqueDiff(fig,angleRev, timeRev, accPolysVsAngle, accPolysVsTime):
   #ax1.grid()
   #ax1.legend(legStr,loc='upper right')
   #ax1.set_xlabel("Time [s]")
-  #ax1.set_ylabel("velociy [rpm]")
-      
+  #ax1.set_ylabel("velociy [rpm]")      
 
 def plotRevLines(ax,overflows,time,ymin,ymax):
    for of in overflows:
