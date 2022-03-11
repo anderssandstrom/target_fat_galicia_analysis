@@ -56,6 +56,7 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
   posMinus1 = 0
   velMinus1 = 0
   time = 0
+  veloOld=0
   for data in dataArray:
     posAct = data * sign
     time = time + 1.0 / sampleRate
@@ -71,9 +72,13 @@ def openAndCalc(npzfilename,xmin,xmax,sign):
       posMinus1 = posAct
       continue # ignore overflows
 
+    
     actVelo = (posAct - posMinus1) * sampleRate / 360 * 60
-
+    if abs(actVelo)-abs(veloOld) > 100: 
+      continue
+      
     allvelo.append (actVelo)
+    veloOld=actVelo
     tempvelo[index] = actVelo
 
     if(index == filterSize - 1):
