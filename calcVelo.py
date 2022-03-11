@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #*************************************************************************
 # Copyright (c) 2020 European Spallation Source ERIC
 # ecmc is distributed subject to a Software License Agreement found
