@@ -75,11 +75,23 @@ def main():
     index=index+1
   
   yDataAvg=[]
+  yDataMax=[]
+  yDataMin=[]
+  yDataLen=[]
+  yDataAvg=[]
   index=0
   for pvname in pvNames:
-    yDataAvg.append(np.mean(yData[index]))
+    yAvgTemp=np.mean(yData[index])
+    yDataAvg.append(yAvgTemp)
+    yMaxTemp=np.max(yData[index])
+    yDataMax.append(yMaxTemp)
+    yMinTemp=np.min(yData[index])
+    yDataMin.append(yMinTemp)
+    yLenTemp=len(yData[index])
+    yDataLen.append(yLenTemp)
+    print(pvname + "[" + str(yLenTemp) + "] " + str(yMinTemp) + ".." + str(yMaxTemp) + "avg: " + str(yAvgTemp)  )
     index=index+1
- 
+
   fig2=plt.figure(2)
 
   legstr=[]
