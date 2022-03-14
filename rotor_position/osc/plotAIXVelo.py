@@ -26,9 +26,12 @@ def main():
 
   
   pvNames=[]
-  
-  pvNames.append("Opto")
+
   pvNames.append("Velo")
+  pvNames.append("AI1")
+  pvNames.append("AI2")  
+  pvNames.append("AI3")
+  
 
   dataFile=sys.stdin
 
@@ -71,33 +74,43 @@ def main():
     index=index+1
   
   yDataAvg=[]
+  yDataMax=[]
+  yDataMin=[]
+  yDataLen=[]
   index=0
   for pvname in pvNames:
-    yDataAvg.append(np.mean(yData[index]))
+    yAvgTemp=np.mean(yData[index])
+    yDataAvg.append(yAvgTemp)
+    yMaxTemp=np.max(yData[index])
+    yDataMax.append(yMaxTemp)
+    yMinTemp=np.min(yData[index])
+    yDataMin.append(yMinTemp)
+    yLenTemp=len(yData[index])
+    yDataLen.append(yLenTemp)
+    print(pvname + "[" + str(yLenTemp) + "] " + str(yMinTemp) + ".." + str(yMaxTemp) + "avg: " + str(yAvgTemp)  )
     index=index+1
  
   fig2=plt.figure(2)
 
   print("len: " + str(len(yData[0])))
-  time0=np.arange(0,len(yData[0]))*0.001
-  time1=np.arange(0,len(yData[1]))*25.714/len(yData[1])
+  timeVelo=np.arange(0,len(yData[0]))*25.714/len(yData[1])
 
-  print("len0: " + str(len(time0)))
-  print("len1: " + str(len(time1)))
-
-  pvMin = np.min(yData[0])
-  pvMax = np.max(yData[0])
-
-
+  timeOther=np.arange(0,len(yData[1]))*0.001
   
-  print("opto range: " + str(pvMax-pvMin))
+  print("len0: " + str(len(timeVelo)))
+  print("len1: " + str(len(timeOther)))
 
-  legstr=[]
 
+  print("")
+ 
   legstr=[]
-  legstr.append("Opto")
+  legstr.append("0deg")
+  legstr.append("120deg")
+  legstr.append("240deg")
   ax1=fig2.add_subplot(2, 1,1 )
-  ax1.plot(time0,yData[0]-(pvMax+pvMin)/2, 'b')
+  ax1.plot(timeOther,yData[1]-(yDataMax[1]+yDataMin[1])/2, 'b')
+  ax1.plot(timeOther,yData[2]-(yDataMax[2]+yDataMin[2])/2, 'g')
+  ax1.plot(timeOther,yData[3]-(yDataMax[3]+yDataMin[3])/2, 'm')
   ax1.legend(legstr)
   ax1.set_ylabel("Position [mm]")
   ax1.grid()
@@ -105,7 +118,7 @@ def main():
   legstr=[]
   legstr.append("Velo")
   ax2=fig2.add_subplot(2, 1, 2)
-  ax2.plot(time1,yData[1], 'b')
+  ax2.plot(timeVelo,yData[0], 'b')
   ax2.legend(legstr)
   ax2.grid()
   ax2.set_ylabel("Velocity [rpm]")
